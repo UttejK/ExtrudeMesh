@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
 import { BoundingBoxGizmo } from "./MakeExtrusion";
 
 const BabylonScene = () => {
   const sceneRef = useRef(null);
+  const [off, setOff] = useState(true);
 
   useEffect(() => {
     const canvas = sceneRef.current;
@@ -14,14 +15,21 @@ const BabylonScene = () => {
     // Create a scene
     const scene = new BABYLON.Scene(engine);
 
-    const box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
+    const box = BABYLON.MeshBuilder.CreateBox(
+      "box",
+      { size: 1, updatable: true },
+      scene
+    );
+    box.convertToFlatShadedMesh();
     box.updateFacetData();
-    console.log(box.facetNb);
-    console.log(box.isFacetDataEnabled);
+    // console.log(box.facetNb);
+    // console.log(box.isFacetDataEnabled);
     box.position = new BABYLON.Vector3(0, 0, 0);
+    // console.log(box.getVerticesData("position"));
+    // You Dont need all the 72 vertices, you only need the first 24
+
     var positions = box.getFacetLocalPositions();
     var normals = box.getFacetLocalNormals();
-
     var lines = [];
     for (var i = 0; i < positions.length; i++) {
       var line = [positions[i], positions[i].add(normals[i])];
@@ -61,56 +69,74 @@ const BabylonScene = () => {
       new BABYLON.Vector3(0, 10, 0),
       scene
     );
-    scene.onPointerDown = (a, pi, b) => {
-      console.log(pi);
-    };
 
-    // scene.onPointerDown = function castRay(e) {
-    //   const hit = scene.pick(scene.pointerX, scene.pointerY);
-
-    //   if (hit.faceId === -1)
-    //     console.log("you did not click on any object in the scene");
-    //   else {
-    //     // console.log(hit.pickedMesh.getVerticesData("position"));
-    //     let pos = hit.pickedMesh.getFacetLocalPositions();
-    //     console.log(hit.pickedMesh.getFacetNormal(hit.faceId));
-
-    //     const vec1 = BABYLON.Vector3(1, 1, 0);
-
-    //     try {
-    //       // for (let i = 0; i < pos.length; i++) {
-    //       //   pos[i] += 0.5;
-    //       // }
-    //       // pos[0] += 0.5;
-    //       // pos[1] += 0.5;
-    //       // pos[2] += 0.5;
-    //       // pos[3] += 0.5;
-    //       // pos[4] += 0.5;
-    //       // pos[5] += 0.5;
-    //       // pos[6] += 0.5;
-    //       // pos[7] += 0.5;
-    //       // hit.pickedMesh.setVerticesData("position", pos, true);
-    //       // console.log(hit.pickedMesh.getVerticesData("position"));
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-
-    //     //   scene.onPointerMove = (e) => {
-    //     //     let positions = box.getVerticesData(
-    //     //       BABYLON.VertexBuffer.PositionKind
-    //     //     );
-    //     //     console.log(positions);
-    //     //     box.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
-    //     //     //console.log(
-    //     //     //  (hit.pickedMesh.setAbsolutePosition = new BABYLON.Vector3(
-    //     //     //    e.clientX / 10,
-    //     //     //    0,
-    //     //     //    e.clientY / 10
-    //     //     //  ))
-    //     //     // );
-    //     //   };
-    //   }
+    // box.scaleFromPivot = function (pivotPoint, sx, sy, sz) {
+    //   var _sx = sx / this.scaling.x;
+    //   var _sy = sy / this.scaling.y;
+    //   var _sz = sz / this.scaling.z;
+    //   this.scaling = new BABYLON.Vector3(sx, sy, sz);
+    //   this.position = new BABYLON.Vector3(
+    //     pivotPoint.x + _sx * (this.position.x - pivotPoint.x),
+    //     pivotPoint.y + _sy * (this.position.y - pivotPoint.y),
+    //     pivotPoint.z + _sz * (this.position.z - pivotPoint.z)
+    //   );
     // };
+    // box.scaleFromPivot(new BABYLON.Vector3(1, 0, 0), 2, 1, 1);
+
+    // onclick
+    scene.onPointerDown = () => {
+      const hit = scene.pick(scene.pointerX, scene.pointerY);
+      const poshit = hit.pickedMesh?.getVerticesData("position");
+      // const test = new BABYLON.Vector3(-1, -1, -1);
+      console.log(hit.pickedMesh?.getFacetPosition(hit.faceId));
+      for (let i = 0; i < poshit?.length; i += 3) {
+        const vertex = new BABYLON.Vector3(
+          poshit[i],
+          poshit[i + 1],
+          poshit[i + 2]
+        );
+
+        // console.log(vertex.x, vertex.y, vertex.z);
+        // console.log(
+        // hit.getNormal(),
+        // vertex,
+        if (BABYLON.Vector3.Dot(hit.getNormal(), vertex) === 0) {
+          console.log(1);
+        }
+        // );
+      }
+      const vertex = poshit?.slice();
+      for (let i = 0; i < poshit?.length; i += 3) {
+        // vertex[0] += 0.1;
+        // vertex[10] += 0.1;
+        // vertex[20] += 0.1;
+        // console.log(vertex);
+      }
+      // console.log(vertex);
+      try {
+        hit.pickedMesh?.setVerticesData(
+          BABYLON.VertexBuffer.PositionKind,
+          vertex
+        );
+        hit.pickedMesh?._generatePointsArray(true);
+        // console.log(
+        //   // hit.pickedMesh?.getVerticesData(BABYLON.VertexBuffer.PositionKind)
+        //   hit.pickedMesh?._geometry._positions
+
+        //   // hit.pickedMesh?.getIndices()
+        // );
+      } catch (err) {
+        console.error(err);
+      }
+      setOff(false);
+    };
+    scene.onPointerMove = () => {
+      if (!off) {
+      }
+    };
+    scene.onPointerUp = () => {
+      setOff(true);
+    };
 
     const enablegizmo = false;
     if (enablegizmo) {
@@ -121,19 +147,6 @@ const BabylonScene = () => {
       box.getClosestFacetAtCoordinates;
     }
 
-    box.scaleFromPivot = function (pivotPoint, sx, sy, sz) {
-      var _sx = sx / this.scaling.x;
-      var _sy = sy / this.scaling.y;
-      var _sz = sz / this.scaling.z;
-      this.scaling = new BABYLON.Vector3(sx, sy, sz);
-      this.position = new BABYLON.Vector3(
-        pivotPoint.x + _sx * (this.position.x - pivotPoint.x),
-        pivotPoint.y + _sy * (this.position.y - pivotPoint.y),
-        pivotPoint.z + _sz * (this.position.z - pivotPoint.z)
-      );
-    };
-
-    box.scaleFromPivot(new BABYLON.Vector3(1, 0, 0), 2, 1, 1);
     const axes = new BABYLON.AxesViewer(scene, 0.5);
 
     window.addEventListener("resize", function () {
