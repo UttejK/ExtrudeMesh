@@ -19,6 +19,22 @@ const BabylonScene = () => {
     console.log(box.facetNb);
     console.log(box.isFacetDataEnabled);
     box.position = BABYLON.Vector3.Zero();
+    box.updateFacetData();
+    var positions = box.getFacetLocalPositions();
+    var normals = box.getFacetLocalNormals();
+
+    var lines = [];
+    for (var i = 0; i < positions.length; i++) {
+      var line = [positions[i], positions[i].add(normals[i])];
+      lines.push(line);
+    }
+    var lineSystem = BABYLON.MeshBuilder.CreateLineSystem(
+      "ls",
+      { lines: lines },
+      scene
+    );
+    lineSystem.color = BABYLON.Color3.Green();
+
     // Create a camera
     // const camera = new BABYLON.FreeCamera(
     //   "camera",
@@ -46,21 +62,38 @@ const BabylonScene = () => {
       scene
     );
 
-    scene.onPointerDown = function castRay() {
+    scene.onPointerDown = function castRay(e) {
       const hit = scene.pick(scene.pointerX, scene.pointerY);
 
       if (hit.faceId === -1)
         console.log("you did not click on any object in the scene");
       else {
-        console.log(hit.pickedMesh.getVerticesData("position"));
+        // console.log(hit.pickedMesh.getVerticesData("position"));
         let pos = hit.pickedMesh.getVerticesData("position");
+
+        console.log(
+          hit.faceId,
+          hit.pickedPoint,
+          box.getClosestFacetAtCoordinates(0, 0, 0)
+        );
+
+        //   hit.pickedMesh.getClosestFacetAtCoordinates(1, 0, 1),
+        //   hit.pickedMesh.getClosestFacetAtLocalCoordinates(1, 0, 1)
+
         try {
           // for (let i = 0; i < pos.length; i++) {
           //   pos[i] += 0.5;
           // }
-          pos[1] += 0.5;
-          hit.pickedMesh.setVerticesData("position", pos, true);
-          console.log(hit.pickedMesh.getVerticesData("position"));
+          // pos[0] += 0.5;
+          // pos[1] += 0.5;
+          // pos[2] += 0.5;
+          // pos[3] += 0.5;
+          // pos[4] += 0.5;
+          // pos[5] += 0.5;
+          // pos[6] += 0.5;
+          // pos[7] += 0.5;
+          // hit.pickedMesh.setVerticesData("position", pos, true);
+          // console.log(hit.pickedMesh.getVerticesData("position"));
         } catch (error) {
           console.error(error);
         }
