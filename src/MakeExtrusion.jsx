@@ -949,6 +949,7 @@ export class BoundingBoxGizmo extends Gizmo {
           if (zeroAxisCount === 1 || zeroAxisCount === 3) {
             continue;
           }
+          // Scale Anchors
           if (scaleBoxes[index]) {
             scaleBoxes[index].position.set(
               this._boundingDimensions.x * (i / 2),

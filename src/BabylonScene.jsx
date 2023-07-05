@@ -15,6 +15,9 @@ const BabylonScene = () => {
     const scene = new BABYLON.Scene(engine);
 
     const box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
+    box.updateFacetData();
+    console.log(box.facetNb);
+    console.log(box.isFacetDataEnabled);
     box.position = BABYLON.Vector3.Zero();
     // Create a camera
     // const camera = new BABYLON.FreeCamera(
@@ -31,9 +34,7 @@ const BabylonScene = () => {
       scene
     );
 
-    // camera.setPosition(new BABYLON.Vector3(0, 0, -15));
-    // Set the target of the camera to the center of the scene
-    // camera.setTarget(BABYLON.Vector3.Zero());
+    camera.setPosition(new BABYLON.Vector3(5, 5, -5));
 
     // Attach the camera to the canvas
     camera.attachControl(canvas, true);
@@ -51,31 +52,44 @@ const BabylonScene = () => {
       if (hit.faceId === -1)
         console.log("you did not click on any object in the scene");
       else {
-        // console.log(hit.getNormal());
-        // console.log(hit.pickedPoint);
-        scene.onPointerMove = (e) => {
-          let positions = box.getVerticesData(
-            BABYLON.VertexBuffer.PositionKind
-          );
-          console.log(positions);
-          box.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
-          //console.log(
-          //  (hit.pickedMesh.setAbsolutePosition = new BABYLON.Vector3(
-          //    e.clientX / 10,
-          //    0,
-          //    e.clientY / 10
-          //  ))
-          // );
-        };
+        console.log(hit.pickedMesh.getVerticesData("position"));
+        let pos = hit.pickedMesh.getVerticesData("position");
+        try {
+          // for (let i = 0; i < pos.length; i++) {
+          //   pos[i] += 0.5;
+          // }
+          pos[1] += 0.5;
+          hit.pickedMesh.setVerticesData("position", pos, true);
+          console.log(hit.pickedMesh.getVerticesData("position"));
+        } catch (error) {
+          console.error(error);
+        }
+
+        //   scene.onPointerMove = (e) => {
+        //     let positions = box.getVerticesData(
+        //       BABYLON.VertexBuffer.PositionKind
+        //     );
+        //     console.log(positions);
+        //     box.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+        //     //console.log(
+        //     //  (hit.pickedMesh.setAbsolutePosition = new BABYLON.Vector3(
+        //     //    e.clientX / 10,
+        //     //    0,
+        //     //    e.clientY / 10
+        //     //  ))
+        //     // );
+        //   };
       }
     };
 
-    const boundingBoxGizmo = new BoundingBoxGizmo();
-    boundingBoxGizmo.setColor(new BABYLON.Color3(0, 0.7, 1));
-    boundingBoxGizmo.attachedMesh = box;
-    boundingBoxGizmo.updateBoundingBox();
-
-    boundingBoxGizmo.enableDragBehavior();
+    const enablegizmo = false;
+    if (enablegizmo) {
+      const boundingBoxGizmo = new BoundingBoxGizmo();
+      boundingBoxGizmo.setColor(new BABYLON.Color3(0, 0.7, 1));
+      boundingBoxGizmo.attachedMesh = box;
+      boundingBoxGizmo.enableDragBehavior();
+      box.getClosestFacetAtCoordinates;
+    }
 
     window.addEventListener("resize", function () {
       engine.resize();
