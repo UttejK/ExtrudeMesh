@@ -18,8 +18,7 @@ const BabylonScene = () => {
     box.updateFacetData();
     console.log(box.facetNb);
     console.log(box.isFacetDataEnabled);
-    box.position = BABYLON.Vector3.Zero();
-    box.updateFacetData();
+    box.position = new BABYLON.Vector3(0, 0, 0);
     var positions = box.getFacetLocalPositions();
     var normals = box.getFacetLocalNormals();
 
@@ -28,12 +27,12 @@ const BabylonScene = () => {
       var line = [positions[i], positions[i].add(normals[i])];
       lines.push(line);
     }
-    var lineSystem = BABYLON.MeshBuilder.CreateLineSystem(
-      "ls",
-      { lines: lines },
-      scene
-    );
-    lineSystem.color = BABYLON.Color3.Green();
+    // var lineSystem = BABYLON.MeshBuilder.CreateLineSystem(
+    //   "ls",
+    //   { lines: lines },
+    //   scene
+    // );
+    // lineSystem.color = BABYLON.Color3.Green();
 
     // Create a camera
     // const camera = new BABYLON.FreeCamera(
@@ -41,6 +40,7 @@ const BabylonScene = () => {
     //   new BABYLON.Vector3(0, 0, 10),
     //   scene
     // );
+
     const camera = new BABYLON.ArcRotateCamera(
       "camera",
       0,
@@ -50,7 +50,7 @@ const BabylonScene = () => {
       scene
     );
 
-    camera.setPosition(new BABYLON.Vector3(5, 5, -5));
+    camera.setPosition(new BABYLON.Vector3(0, 0, 5));
 
     // Attach the camera to the canvas
     camera.attachControl(canvas, true);
@@ -61,59 +61,56 @@ const BabylonScene = () => {
       new BABYLON.Vector3(0, 10, 0),
       scene
     );
-
-    scene.onPointerDown = function castRay(e) {
-      const hit = scene.pick(scene.pointerX, scene.pointerY);
-
-      if (hit.faceId === -1)
-        console.log("you did not click on any object in the scene");
-      else {
-        // console.log(hit.pickedMesh.getVerticesData("position"));
-        let pos = hit.pickedMesh.getVerticesData("position");
-
-        console.log(
-          hit.faceId,
-          hit.pickedPoint,
-          box.getClosestFacetAtCoordinates(0, 0, 0)
-        );
-
-        //   hit.pickedMesh.getClosestFacetAtCoordinates(1, 0, 1),
-        //   hit.pickedMesh.getClosestFacetAtLocalCoordinates(1, 0, 1)
-
-        try {
-          // for (let i = 0; i < pos.length; i++) {
-          //   pos[i] += 0.5;
-          // }
-          // pos[0] += 0.5;
-          // pos[1] += 0.5;
-          // pos[2] += 0.5;
-          // pos[3] += 0.5;
-          // pos[4] += 0.5;
-          // pos[5] += 0.5;
-          // pos[6] += 0.5;
-          // pos[7] += 0.5;
-          // hit.pickedMesh.setVerticesData("position", pos, true);
-          // console.log(hit.pickedMesh.getVerticesData("position"));
-        } catch (error) {
-          console.error(error);
-        }
-
-        //   scene.onPointerMove = (e) => {
-        //     let positions = box.getVerticesData(
-        //       BABYLON.VertexBuffer.PositionKind
-        //     );
-        //     console.log(positions);
-        //     box.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
-        //     //console.log(
-        //     //  (hit.pickedMesh.setAbsolutePosition = new BABYLON.Vector3(
-        //     //    e.clientX / 10,
-        //     //    0,
-        //     //    e.clientY / 10
-        //     //  ))
-        //     // );
-        //   };
-      }
+    scene.onPointerDown = (a, pi, b) => {
+      console.log(pi);
     };
+
+    // scene.onPointerDown = function castRay(e) {
+    //   const hit = scene.pick(scene.pointerX, scene.pointerY);
+
+    //   if (hit.faceId === -1)
+    //     console.log("you did not click on any object in the scene");
+    //   else {
+    //     // console.log(hit.pickedMesh.getVerticesData("position"));
+    //     let pos = hit.pickedMesh.getFacetLocalPositions();
+    //     console.log(hit.pickedMesh.getFacetNormal(hit.faceId));
+
+    //     const vec1 = BABYLON.Vector3(1, 1, 0);
+
+    //     try {
+    //       // for (let i = 0; i < pos.length; i++) {
+    //       //   pos[i] += 0.5;
+    //       // }
+    //       // pos[0] += 0.5;
+    //       // pos[1] += 0.5;
+    //       // pos[2] += 0.5;
+    //       // pos[3] += 0.5;
+    //       // pos[4] += 0.5;
+    //       // pos[5] += 0.5;
+    //       // pos[6] += 0.5;
+    //       // pos[7] += 0.5;
+    //       // hit.pickedMesh.setVerticesData("position", pos, true);
+    //       // console.log(hit.pickedMesh.getVerticesData("position"));
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+
+    //     //   scene.onPointerMove = (e) => {
+    //     //     let positions = box.getVerticesData(
+    //     //       BABYLON.VertexBuffer.PositionKind
+    //     //     );
+    //     //     console.log(positions);
+    //     //     box.updateVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+    //     //     //console.log(
+    //     //     //  (hit.pickedMesh.setAbsolutePosition = new BABYLON.Vector3(
+    //     //     //    e.clientX / 10,
+    //     //     //    0,
+    //     //     //    e.clientY / 10
+    //     //     //  ))
+    //     //     // );
+    //     //   };
+    //   }
+    // };
 
     const enablegizmo = false;
     if (enablegizmo) {
@@ -123,6 +120,21 @@ const BabylonScene = () => {
       boundingBoxGizmo.enableDragBehavior();
       box.getClosestFacetAtCoordinates;
     }
+
+    box.scaleFromPivot = function (pivotPoint, sx, sy, sz) {
+      var _sx = sx / this.scaling.x;
+      var _sy = sy / this.scaling.y;
+      var _sz = sz / this.scaling.z;
+      this.scaling = new BABYLON.Vector3(sx, sy, sz);
+      this.position = new BABYLON.Vector3(
+        pivotPoint.x + _sx * (this.position.x - pivotPoint.x),
+        pivotPoint.y + _sy * (this.position.y - pivotPoint.y),
+        pivotPoint.z + _sz * (this.position.z - pivotPoint.z)
+      );
+    };
+
+    box.scaleFromPivot(new BABYLON.Vector3(1, 0, 0), 2, 1, 1);
+    const axes = new BABYLON.AxesViewer(scene, 0.5);
 
     window.addEventListener("resize", function () {
       engine.resize();
