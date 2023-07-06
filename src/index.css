@@ -9,6 +9,7 @@ html {
 *::before,
 *::after {
   box-sizing: inherit;
+  margin: 0;
 }
 
 /* Remove margin and padding */
@@ -95,3 +96,22 @@ summary {
 }
 
 /* Add your custom styles below this line */
+.GithubLink {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-weight: 600;
+  font-size: 32;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1rem;
+  opacity: 0.25;
+  transition: opacity 0.2s ease-in;
+}
+
+.GithubLink:hover {
+  opacity: 0.95;
+}

@@ -233,7 +233,22 @@ const BabylonScene = () => {
     };
   }, []);
 
-  return <canvas ref={sceneRef} style={{ width: "100vw", height: "100vh" }} />;
+  return (
+    <>
+      <a href="https://github.com/UttejK/ExtrudeMesh" className="GithubLink">
+        <span>UTTEJ K</span>
+        <img
+          src="/github-mark.svg"
+          alt="github"
+          style={{
+            height: "2rem",
+            width: "2rem",
+          }}
+        />
+      </a>
+      <canvas ref={sceneRef} style={{ width: "100vw", height: "100vh" }} />
+    </>
+  );
 };
 
 export default BabylonScene;
