@@ -46,6 +46,10 @@ To try out the project, you have two options:
 
    Note: The drag behavior allows you to interactively drag the mesh instead of using the click-and-move method described earlier. Ensure the changes are made correctly for the drag behavior to work.
 
+The Video Preview for the project is as follows:
+
+<video src="public/ExtrudeMesh_UttejK.mp4" controls title="Title"></video>
+
 Feel free to explore the code and experiment with the mesh extrusion functionality in the Babylon.js scene!
 
 For more details and to access the source code, visit the [GitHub repository](https://github.com/UttejK/ExtrudeMesh).
