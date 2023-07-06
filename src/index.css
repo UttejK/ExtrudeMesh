@@ -115,3 +115,20 @@ summary {
 .GithubLink:hover {
   opacity: 0.95;
 }
+
+/* Color Theme Swatches in RGBA */
+.color-1 {
+  color: rgba(2, 64, 89, 1);
+}
+.color-2 {
+  color: rgba(1, 89, 80, 1);
+}
+.color-3 {
+  color: rgba(2, 114, 94, 1);
+}
+.color-4 {
+  color: rgba(2, 140, 62, 1);
+}
+.color-5 {
+  color: rgba(12, 242, 92, 1);
+}

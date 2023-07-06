@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
+import { ClipPlanesBlock } from "babylonjs";
 
 const MOVE_SPEED = 5;
-const BOX_COLOR = new BABYLON.Color4(1, 1, 1, 1);
-const BOX_TRANSPARENT_COLOR = new BABYLON.Color4(1, 1, 1, 0.4);
 const HOVER_COLOR = new BABYLON.Color4(12 / 255, 242 / 255, 93 / 255, 1);
-const GHOST_COLOR = new BABYLON.Color4(2 / 255, 114 / 255, 95 / 255, 1);
 
+// Get the indices of the facets that share the same vertex
 function getShared(indices, positions) {
   const shared = Array.from({ length: indices.length }, () => []);
 
@@ -28,18 +27,23 @@ function getShared(indices, positions) {
 }
 
 const BabylonScene = () => {
+  // Creating reference for scene
   const sceneRef = useRef(null);
 
+  // Creating state variables to know if the user is Dragging or not
   const [dragging, setDragging] = useState(false);
+  // State for saving the pointer hit info
   const [hitInfo, setHitInfo] = useState(null);
 
+  // Refs for Dragging and hit information
   const draggingRef = useRef();
   const hitInfoRef = useRef();
-
   draggingRef.current = dragging;
   hitInfoRef.current = hitInfo;
 
+  // Render Loop
   useEffect(() => {
+    // Ref to canvas
     const canvas = sceneRef.current;
 
     // Create the Babylon.js engine
@@ -48,29 +52,39 @@ const BabylonScene = () => {
     // Create a scene
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(3 / 255, 65 / 255, 89 / 255, 1);
-    scene.useOrderIndependentTransparency = true;
 
-    let plane = null;
+    // Create a box
     let box = BABYLON.MeshBuilder.CreateBox(
       "box",
-      { size: 1, updatable: true },
+      { size: 1, updatable: true, edgesRenderer: true },
       scene
     );
 
-    box.hasVertexAlpha = true;
-    box.convertToFlatShadedMesh();
+    // Convert the shading of the mesh from smooth or AutoSmooth (whichever the default is) to flat shaded
 
+    box.convertToFlatShadedMesh();
     box.position = new BABYLON.Vector3(0, 0, 0);
 
+    // Uncomment the following lines to show the edges of the cube
+
+    // box.enableEdgesRendering(1, true);
+    // box.edgesWidth = 2.0;
+    // box.edgesColor = new BABYLON.Color4(2 / 255, 115 / 255, 94 / 255, 1);
+    // box.edgesColor = new BABYLON.Color4(94 / 255, 16 / 255, 2 / 255, 1);
+
+    // Save the Positions and the default vertex colors
     let positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     let colors = box.getVerticesData(BABYLON.VertexBuffer.ColorKind);
 
+    // if colors array is undefined recreate them with a white color
     if (!colors)
       colors = Array.from({ length: (positions.length / 3) * 4 }, () => 1);
 
+    // Get the indices of the box and the shared indices from the functioned defined above
     const indices = box.getIndices();
     const shared = getShared(indices, positions);
 
+    // Create a camera object, (basically what we see through) and set its initial position and target
     const camera = new BABYLON.ArcRotateCamera(
       "camera",
       0,
@@ -83,7 +97,14 @@ const BabylonScene = () => {
     camera.setPosition(new BABYLON.Vector3(0, 0, 5));
     camera.attachControl(canvas, true);
 
-    new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 10, 0), scene);
+    // Create an environment light and position it right above the mesh NOTE: if the
+    // distance is too less, there is a chance that the top face would look blown
+    // out, which is why I chose such a huge value
+    new BABYLON.HemisphericLight(
+      "light",
+      new BABYLON.Vector3(0, 1000, 0),
+      scene
+    );
 
     window.addEventListener("resize", function () {
       engine.resize();
@@ -92,28 +113,6 @@ const BabylonScene = () => {
     engine.runRenderLoop(() => {
       scene.render();
     });
-
-    const clearBoxColor = (color) => {
-      colors = Array.from({ length: positions.length / 3 }, () =>
-        color.asArray()
-      ).flat();
-      box.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
-    };
-
-    const highlightFace = (face, color) => {
-      const facet = 2 * Math.floor(face);
-
-      for (var i = 0; i < 6; i++) {
-        const vertex = indices[3 * facet + i];
-
-        colors[4 * vertex] = color.r;
-        colors[4 * vertex + 1] = color.g;
-        colors[4 * vertex + 2] = color.b;
-        colors[4 * vertex + 3] = color.a;
-      }
-
-      box.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
-    };
 
     let counter = 0;
     scene.onPointerDown = () => {
@@ -126,7 +125,7 @@ const BabylonScene = () => {
           const face = hit.faceId / 2;
           const facet = 2 * Math.floor(face);
           const normal = hit.getNormal();
-
+          // console.log(face, facet);
           setHitInfo({
             face,
             facet,
@@ -136,29 +135,8 @@ const BabylonScene = () => {
               y: scene.pointerY,
             },
           });
-
-          clearBoxColor(BOX_TRANSPARENT_COLOR);
-          highlightFace(face, GHOST_COLOR);
-
-          plane = BABYLON.MeshBuilder.CreatePlane("temp", {}, scene);
-          plane.setIndices([0, 1, 2, 3, 4, 5]);
-          plane.setVerticesData(
-            BABYLON.VertexBuffer.PositionKind,
-            indices
-              .slice(3 * facet, 3 * facet + 6)
-              .map((i) => [...positions.slice(3 * i, 3 * i + 3)])
-              .flat()
-          );
-          plane.setVerticesData(
-            BABYLON.VertexBuffer.ColorKind,
-            Array.from({ length: 6 }).fill(HOVER_COLOR.asArray()).flat()
-          );
-          plane.updateFacetData();
-          plane.convertToFlatShadedMesh();
         }
       } else if (counter === 1) {
-        plane.dispose();
-
         counter = 0;
         camera.attachControl(canvas, true);
 
@@ -217,13 +195,25 @@ const BabylonScene = () => {
           },
         });
       } else {
-        clearBoxColor(BOX_COLOR);
+        colors = Array.from({ length: (positions.length / 3) * 4 }, () => 1);
+        box.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
 
         const hit = scene.pick(scene.pointerX, scene.pointerY);
 
         if (hit.pickedMesh) {
           const face = hit.faceId / 2;
-          highlightFace(face, HOVER_COLOR);
+          const facet = 2 * Math.floor(face);
+
+          for (var i = 0; i < 6; i++) {
+            const vertex = indices[3 * facet + i];
+
+            colors[4 * vertex] = HOVER_COLOR.r;
+            colors[4 * vertex + 1] = HOVER_COLOR.g;
+            colors[4 * vertex + 2] = HOVER_COLOR.b;
+            colors[4 * vertex + 3] = HOVER_COLOR.a;
+          }
+
+          box.setVerticesData(BABYLON.VertexBuffer.ColorKind, colors);
         }
       }
     };
