@@ -99,7 +99,7 @@ const BabylonScene = () => {
           const face = hit.faceId / 2;
           const facet = 2 * Math.floor(face);
           const normal = hit.getNormal();
-
+          // console.log(face, facet);
           setHitInfo({
             face,
             facet,
@@ -210,6 +210,7 @@ const BabylonScene = () => {
     Reset.color = "#ffffff";
     Reset.paddingRight = "20px";
     Reset.paddingTop = "20px";
+    Reset.hoverCursor = "pointer";
 
     Reset.onPointerClickObservable.add(function () {
       box.dispose();
