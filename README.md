@@ -48,7 +48,8 @@ To try out the project, you have two options:
 
 The Video Preview for the project is as follows:
 
-<video src="public/ExtrudeMesh_UttejK.mp4" controls title="Title"></video>
+https://github.com/UttejK/ExtrudeMesh/assets/114231462/249f4d66-957a-4a6c-b107-feb31381e8c4
+
 
 Feel free to explore the code and experiment with the mesh extrusion functionality in the Babylon.js scene!
 
