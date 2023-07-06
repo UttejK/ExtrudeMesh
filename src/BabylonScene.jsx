@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
+import * as GUI from "@babylonjs/gui";
+import { ClipPlanesBlock } from "babylonjs";
 
 const MOVE_SPEED = 5;
 const HOVER_COLOR = new BABYLON.Color4(12 / 255, 242 / 255, 93 / 255, 1);
@@ -56,6 +58,7 @@ const BabylonScene = () => {
     box.position = new BABYLON.Vector3(0, 0, 0);
 
     let positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    // let _originals = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     let colors = box.getVerticesData(BABYLON.VertexBuffer.ColorKind);
 
     if (!colors)
@@ -187,6 +190,39 @@ const BabylonScene = () => {
       setDragging(false);
       setHitInfo(null);
     };
+
+    const Ui = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+    const Reset = GUI.Button.CreateSimpleButton("Reset", "Reset");
+    Reset.widthInPixels = 220;
+    Reset.heightInPixels = 70;
+    Reset.cornerRadius = 20;
+    Reset.horizontalAlignment = 1;
+    Reset.verticalAlignment = 0;
+    Reset.background = "#ffffff30";
+    Reset.color = "#ffffff";
+    Reset.paddingRight = "20px";
+    Reset.paddingTop = "20px";
+
+    Reset.onPointerClickObservable.add(function () {
+      // box.setVerticesData(BABYLON.VertexBuffer.PositionKind, _originals);
+
+      // console.log("Positions Reset DONE");
+      box.dispose();
+      scene.dispose();
+      window.location.reload();
+      // const box = new BABYLON.MeshBuilder.CreateBox(
+      //   "box",
+      //   { size: 1, updatable: true },
+      //   scene
+      // );
+      // box.position = new BABYLON.Vector3(0, 0, 0);
+    });
+    Ui.addControl(Reset);
+
+    // const handleClick = () => {
+    //   box.setVerticesData(BABYLON.VertexBuffer.PositionKind, _originals);
+    //   return box;
+    // };
 
     // Clean up on component unmount
     return () => {
