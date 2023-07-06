@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as BABYLON from "@babylonjs/core";
 
 const MOVE_SPEED = 5;
-// const HOVER_COLOR = new BABYLON.Color4(30 / 255, 100 / 255, 110 / 255, 1);
-const HOVER_COLOR = new BABYLON.Color4(242 / 255, 102 / 255, 139 / 255, 1);
+const HOVER_COLOR = new BABYLON.Color4(12 / 255, 242 / 255, 93 / 255, 1);
 
 function getShared(indices, positions) {
   const shared = Array.from({ length: indices.length }, () => []);
@@ -18,9 +17,9 @@ function getShared(indices, positions) {
         shared[indices[i]].push(indices[j]);
       }
     }
-    if (shared[i].length < 6) console.log(i);
+    // if (shared[i].length < 6) console.log(i);
   }
-
+  // console.log(shared);
   return shared;
 }
 
@@ -44,7 +43,7 @@ const BabylonScene = () => {
 
     // Create a scene
     const scene = new BABYLON.Scene(engine);
-    scene.clearColor = new BABYLON.Color4(1 / 255, 31 / 255, 38 / 255, 1);
+    scene.clearColor = new BABYLON.Color4(3 / 255, 65 / 255, 89 / 255, 1);
 
     const box = BABYLON.MeshBuilder.CreateBox(
       "box",
