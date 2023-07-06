@@ -47,7 +47,7 @@ const BabylonScene = () => {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(3 / 255, 65 / 255, 89 / 255, 1);
 
-    const box = BABYLON.MeshBuilder.CreateBox(
+    let box = BABYLON.MeshBuilder.CreateBox(
       "box",
       { size: 1, updatable: true },
       scene
@@ -58,7 +58,6 @@ const BabylonScene = () => {
     box.position = new BABYLON.Vector3(0, 0, 0);
 
     let positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-    // let _originals = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     let colors = box.getVerticesData(BABYLON.VertexBuffer.ColorKind);
 
     if (!colors)
@@ -89,25 +88,34 @@ const BabylonScene = () => {
       scene.render();
     });
 
+    let counter = 0;
     scene.onPointerDown = () => {
       const hit = scene.pick(scene.pointerX, scene.pointerY);
+      if (counter === 0 && hit.pickedMesh) {
+        counter++;
+        if (hit.pickedMesh) {
+          setDragging(true);
 
-      if (hit.pickedMesh) {
-        setDragging(true);
+          const face = hit.faceId / 2;
+          const facet = 2 * Math.floor(face);
+          const normal = hit.getNormal();
 
-        const face = hit.faceId / 2;
-        const facet = 2 * Math.floor(face);
-        const normal = hit.getNormal();
+          setHitInfo({
+            face,
+            facet,
+            normal,
+            position: {
+              x: scene.pointerX,
+              y: scene.pointerY,
+            },
+          });
+        }
+      } else if (counter === 1) {
+        counter = 0;
+        camera.attachControl(canvas, true);
 
-        setHitInfo({
-          face,
-          facet,
-          normal,
-          position: {
-            x: scene.pointerX,
-            y: scene.pointerY,
-          },
-        });
+        setDragging(false);
+        setHitInfo(null);
       }
     };
 
@@ -184,12 +192,12 @@ const BabylonScene = () => {
       }
     };
 
-    scene.onPointerUp = () => {
-      camera.attachControl(canvas, true);
+    // scene.onPointerUp = () => {
+    //   camera.attachControl(canvas, true);
 
-      setDragging(false);
-      setHitInfo(null);
-    };
+    //   setDragging(false);
+    //   setHitInfo(null);
+    // };
 
     const Ui = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
     const Reset = GUI.Button.CreateSimpleButton("Reset", "Reset");
@@ -204,25 +212,18 @@ const BabylonScene = () => {
     Reset.paddingTop = "20px";
 
     Reset.onPointerClickObservable.add(function () {
-      // box.setVerticesData(BABYLON.VertexBuffer.PositionKind, _originals);
-
-      // console.log("Positions Reset DONE");
       box.dispose();
-      scene.dispose();
-      window.location.reload();
-      // const box = new BABYLON.MeshBuilder.CreateBox(
-      //   "box",
-      //   { size: 1, updatable: true },
-      //   scene
-      // );
-      // box.position = new BABYLON.Vector3(0, 0, 0);
+      box = new BABYLON.MeshBuilder.CreateBox(
+        "box",
+        { size: 1, updatable: true },
+        scene
+      );
+      box.convertToFlatShadedMesh();
+      box.position = new BABYLON.Vector3(0, 0, 0);
+      positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+      console.log("Positions Reset DONE");
     });
     Ui.addControl(Reset);
-
-    // const handleClick = () => {
-    //   box.setVerticesData(BABYLON.VertexBuffer.PositionKind, _originals);
-    //   return box;
-    // };
 
     // Clean up on component unmount
     return () => {
