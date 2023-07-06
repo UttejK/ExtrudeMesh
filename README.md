@@ -48,4 +48,4 @@ To try out the project, you have two options:
 
 Feel free to explore the code and experiment with the mesh extrusion functionality in the Babylon.js scene!
 
-For more details and to access the source code, visit the [GitHub repository](https://github.com/<your-github-username>/<your-repository-name>).
+For more details and to access the source code, visit the [GitHub repository](https://github.com/UttejK/ExtrudeMesh).
