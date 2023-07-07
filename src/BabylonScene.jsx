@@ -65,6 +65,11 @@ const BabylonScene = () => {
       scene
     );
 
+    // let box = BABYLON.MeshBuilder.CreateCylinder(
+    //   "box",
+    //   { height: 1, diameter: 1 },
+    //   scene
+    // );
     box.hasVertexAlpha = true;
     // Convert the shading of the mesh from smooth or AutoSmooth (whichever the default is) to flat shaded
     box.convertToFlatShadedMesh();

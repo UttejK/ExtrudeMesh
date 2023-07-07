@@ -44,12 +44,15 @@ To try out the project, you have two options:
      - Uncomment the part in the code that says `scene.onPointerUp()` and the code within that function.
      - Remove the counter being set in the `scene.onPointerDown()` function.
 
+6. **Changing the Mesh to anything else**
+
+   - You can choose any mesh and the extrusion function would still work, except, after the reset, it is going to reset to being a cube and there might be small bugs, that can be fixed in no time.
+
    Note: The drag behavior allows you to interactively drag the mesh instead of using the click-and-move method described earlier. Ensure the changes are made correctly for the drag behavior to work.
 
 The Video Preview for the project is as follows:
 
 https://github.com/UttejK/ExtrudeMesh/assets/114231462/249f4d66-957a-4a6c-b107-feb31381e8c4
-
 
 Feel free to explore the code and experiment with the mesh extrusion functionality in the Babylon.js scene!
 
